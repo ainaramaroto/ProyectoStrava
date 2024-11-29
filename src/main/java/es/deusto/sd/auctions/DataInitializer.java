@@ -6,6 +6,7 @@
 package es.deusto.sd.auctions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import es.deusto.sd.auctions.dao.RetoRepository;
+import es.deusto.sd.auctions.dao.SesionRepository;
+import es.deusto.sd.auctions.dao.UsuarioRepository;
 import es.deusto.sd.auctions.entity.Deporte;
 import es.deusto.sd.auctions.entity.Reto;
+import es.deusto.sd.auctions.entity.Session;
 import es.deusto.sd.auctions.entity.TipoRegistro;
 import es.deusto.sd.auctions.entity.TipoReto;
 import es.deusto.sd.auctions.entity.Usuario;
@@ -27,38 +32,38 @@ public class DataInitializer {
 	private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 	
     @Bean
-    CommandLineRunner initData(ServicioStrava servicioStrava, ServicioAutorizacion servicioAutentificacion) {
+    CommandLineRunner initData(UsuarioRepository usuarioRepository, RetoRepository retoRepository, SesionRepository sesionRepository) {
 		return args -> {			
 			// Create some users
+				
 			
 			Usuario naroa = new Usuario("Naroa", "naroaAzcona", "1", "naroa.azcona@gmail.com",10000, 59, 168, 70,66, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.GOOGLE);
 			Usuario ander = new Usuario("Ander", "anderGonzalez", "1", "ander.gonzalez@gmail.com", 10000, 56, 80,162, 80, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.META);
 			Usuario gorka = new Usuario("Gorka", "gorkaOrtuzar", "1", "gorka.ortuzar@gmail.com", 100001, 65, 170,50 ,100, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.GOOGLE);
 			Usuario ainara = new Usuario("Ainara", "ainaraMaroto", "1", "ainara.maroto@gmail.com", 10000, 54, 172, 60,75, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.GOOGLE);
 
-			servicioAutentificacion.addUser(naroa);
-			servicioAutentificacion.addUser(ander);
-			servicioAutentificacion.addUser(gorka);
-			servicioAutentificacion.addUser(ainara);
+			usuarioRepository.saveAll(List.of(naroa, ander, gorka, ainara));			
+			
 			
 			logger.info("Users saved!");
 			
 			// Create some retos y sesiones
 			
-			servicioStrava.aniadirReto(ainara, "Reto1", 20000, 500000, Deporte.ciclismo, TipoReto.DISTANCIA);
-			servicioStrava.aniadirReto(naroa, "Reto2", 10000, 20000, Deporte.running, TipoReto.TIEMPO);
-			servicioStrava.aniadirReto(gorka, "Reto3", 4000, 99999, Deporte.running, TipoReto.DISTANCIA);
-			servicioStrava.aniadirReto(ander, "Reto4", 555555, 40000, Deporte.ciclismo, TipoReto.TIEMPO);
+			Reto r1= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.TIEMPO, ainara,new ArrayList<Usuario>());
+			Reto r2= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, gorka,new ArrayList<Usuario>());
+			Reto r3= new Reto(1, "reto1", 10000,20000, Deporte.running,TipoReto.TIEMPO, ander,new ArrayList<Usuario>());
+			Reto r4= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, naroa,new ArrayList<Usuario>());
 			
+			retoRepository.saveAll(List.of(r1, r2, r3,r4));
             logger.info("Retos saved!");						
 
+			Session s1 = new Session(0, "Sesion1", Deporte.ciclismo, 70, 3000, 5000, 240, ainara);
+			Session s2 = new Session(0, "Sesion2", Deporte.running, 10, 4000, 4050, 30, gorka);
+			Session s3 = new Session(0, "Sesion3", Deporte.ciclismo, 100, 5000, 12000, 360, naroa);
+			Session s4 = new Session(0, "Sesion4", Deporte.running, 20, 6000, 8000, 80, ander);
 			
-			servicioStrava.aniadirSesion(ainara, "Sesion 1 de ciclismo", Deporte.ciclismo, 10, 10, 12, 2);
-			servicioStrava.aniadirSesion(naroa, "Sesion 4 de running", Deporte.running, 7, 9, 10, 1);
-			servicioStrava.aniadirSesion(gorka, "Sesion 9 de running", Deporte.running, 10, 11, 12, 1);
-			servicioStrava.aniadirSesion(ander, "Sesion 5 de ciclismo", Deporte.ciclismo, 15, 16, 19, 3);
-
-		
+			sesionRepository.saveAll(List.of(s1, s2, s3,s4));
+            logger.info("Retos saved!");
             logger.info("Sessions saved!");						
 		};
 	}

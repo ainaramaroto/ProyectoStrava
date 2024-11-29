@@ -33,31 +33,7 @@ public class ControllerAutorizacion {
 		this.servicioAutorizacion = authService;
 	}
     
-	//Registrar un nuevo usuario
-	@Operation(
-	        summary = "Registro de un nuevo usuario",
-	        description = "Allows a user to register by providing email and password. Returns a token if successful.",
-	        responses = {
-	        		//201 = The request succeeded, and a new resource was created as a result
-	        		//400 = The server cannot or will not process the request due to something that is perceived to be a client error 
-	            @ApiResponse(responseCode = "201", description = "Creado: Usuario registrado correctamente"),
-	            @ApiResponse(responseCode = "400", description = "Error: Correo electrónico o contraseña no válidos"),
-	        }
-	    )
-	
-	 @PostMapping("/registro")
-    public ResponseEntity<Void> registro(
-    		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
-    		@RequestBody UsuarioDTO usuarioDTO) {    	
-    	if(servicioAutorizacion.getUserByEmail(usuarioDTO.getEmail()) != null) {
-    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    	}
-    	//convertir de usuarioDTO a Usuario
-    	servicioAutorizacion.addUser(usuarioDTO.usuarioDTOaUsuario());
-		return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-	
-	    
+	   
     // Login endpoint
     @Operation(
         summary = "Login to the system",

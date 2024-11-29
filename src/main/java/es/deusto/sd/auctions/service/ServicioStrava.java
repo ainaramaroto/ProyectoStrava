@@ -6,14 +6,18 @@
 package es.deusto.sd.auctions.service;
 
 import java.security.SecureRandom;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import es.deusto.sd.auctions.dao.RetoRepository;
+import es.deusto.sd.auctions.dao.SesionRepository;
 import es.deusto.sd.auctions.entity.Deporte;
 import es.deusto.sd.auctions.entity.Reto;
 import es.deusto.sd.auctions.entity.Session;
@@ -23,28 +27,37 @@ import es.deusto.sd.auctions.entity.Usuario;
 @Service
 public class ServicioStrava {
 
-	// Simulating category and article repositories
+	private final RetoRepository retoRepository ;
+	private final SesionRepository sesionRepository;
+	
 	private static Map<Long, Reto> mRetos = new HashMap<>();
 	private static Map<Long, Session> mSesiones = new HashMap<>();
 
 	//MÉTODOS PARA LOS RETOS
+	
+	public ServicioStrava(RetoRepository retoRepository,SesionRepository sesionRepository) {
+		this.retoRepository = retoRepository;
+		this.sesionRepository = sesionRepository;
+	}
 	public Reto getReto(Long id) {
 		return mRetos.get(id);
 	}
 	
 	public List<Reto> getRetos() {
-		return new ArrayList<Reto>(mRetos.values());
+		return retoRepository.findAll();
 	}
 	
-
-	private long IdReto = 0;
-
-	public void aniadirReto(Usuario u, String nombre, long fechainicio,long fechaFin, Deporte d, TipoReto tr) {
-		long id = IdReto++; // Generar un nuevo id único
-		Reto reto = new Reto(id, nombre, fechainicio, fechaFin, d, tr, u, new ArrayList<>());
-		u.getListadeRetosCreados().add(reto);
-		mRetos.put(reto.getId(), reto);
+	public List<Usuario> getRetosPorID(long ID) {
+		Optional<Reto> retos = retoRepository.findByID(ID);
+		if(retos.isEmpty()) {
+			 throw new RuntimeException("Retos not found");
+        }
+		return retos.get().getUsuarios();
 	}
+
+	public Usuario getUsuarioPorNombreUsuario(String nobre) {
+		return null;
+		}
 	
 	public boolean aceptarReto(Usuario u,Reto r) {
 		if (r.getUsuarios().contains(u)) {
@@ -57,16 +70,15 @@ public class ServicioStrava {
 		}
 		return false;
 	}
+	private long IdReto = 0;
 
-	public List<Reto> getRetosPorDeporte(Deporte deporte) {
-		List<Reto> retos = new ArrayList<>();
-		for(Reto r: mRetos.values()) {
-			if(r.getDeporte().equals(deporte)) {
-				retos.add(r);
-			}
-		}
-		return retos;
+	public void aniadirReto(Usuario u, String nombre, long fechainicio,long fechaFin, Deporte d, TipoReto tr) {
+		long id = IdReto++; // Generar un nuevo id único
+		Reto reto = new Reto(id, nombre, fechainicio, fechaFin, d, tr, u, new ArrayList<>());
+		u.getListadeRetosCreados().add(reto);
+		mRetos.put(reto.getId(), reto);
 	}
+	
 	
 	//LocalDate
 	public List<Reto> getRetosPorFecha(long horaIni, long horaFin){
@@ -96,6 +108,15 @@ public class ServicioStrava {
 		List<Reto> retos = new ArrayList<>();
 		for (Reto r: mRetos.values()) {
 			if(r.getUsuario().equals(u)) {
+				retos.add(r);
+			}
+		}
+		return retos;
+	}
+	public List<Reto> getRetosPorDeporte(Deporte deporte) {
+		List<Reto> retos = new ArrayList<>();
+		for(Reto r: mRetos.values()) {
+			if(r.getDeporte().equals(deporte)) {
 				retos.add(r);
 			}
 		}
