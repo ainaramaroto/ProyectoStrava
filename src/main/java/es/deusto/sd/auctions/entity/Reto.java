@@ -1,130 +1,148 @@
 package es.deusto.sd.auctions.entity;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "Retos")
+public class Reto {
 
-public class Reto  {
-	private long id;
-	private String nombreReto;
-	private long fechaInicio;
-	private long fechaFin;
-	private Deporte deporte;
-	private TipoReto tipoReto;
-	private Usuario usuario;
-	private List<Usuario> usuarios;
-	
-	public Reto() {
-		super();
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-	public Reto(long id, String nombreReto, long fechaInicio, long fechaFin, Deporte deporte, TipoReto tipoReto, Usuario usuario,
-			 List<Usuario> usuarios) {
-		super();
-		this.id = id;
-		this.nombreReto = nombreReto;
-		this.fechaInicio = fechaInicio;
-		this.fechaFin = fechaFin;
-		this.deporte = deporte;
-		this.tipoReto = tipoReto;
-		this.usuario = usuario;
-		this.usuarios = usuarios;
-	}
+    @Column(nullable = false, unique = false)
+    private String nombreReto;
 
-	public long getId() {
-		return id;
-	}
+    @Column(nullable = false, unique = false)
+    private long fechaInicio;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    @Column(nullable = false, unique = false)
+    private long fechaFin;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = false)
+    private Deporte deporte;
 
-	public long getFechaInicio() {
-		return fechaInicio;
-	}
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = false)
+    private TipoReto tipoReto;
 
-	public void setFechaInicio(long fechaInicio) {
-		this.fechaInicio = fechaInicio;
-	}
+    // Usuario creador del reto
+    @ManyToOne
+    @JoinColumn(name = "usuario_creador_id", nullable = false)
+    private Usuario usuarioCreador;
 
-	public long getFechaFin() {
-		return fechaFin;
-	}
+    // Usuarios que han aceptado este reto
+    @ManyToMany
+    @JoinTable(name = "usuario_retos_aceptados",joinColumns = @JoinColumn(name = "reto_id"),inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> usuariosAceptados = new ArrayList<>();
 
-	public void setFechaFin(long fechaFin) {
-		this.fechaFin = fechaFin;
-	}
+    // Usuarios que han completado este reto
+    @ManyToMany
+    @JoinTable(name = "usuario_retos_completados",joinColumns = @JoinColumn(name = "reto_id"),inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> usuariosCompletados = new ArrayList<>();
+    
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = true) // Relación con Usuario
+    private Usuario usuario;
 
-	public Deporte getDeporte() {
-		return deporte;
-	}
+    // Constructor vacío
+    public Reto() {}
 
-	public void setDeporte(Deporte deporte) {
-		this.deporte = deporte;
-	}
+    // Constructor con parámetros
+    public Reto(String nombreReto, long fechaInicio, long fechaFin, Deporte deporte, TipoReto tipoReto, Usuario usuarioCreador) {
+        this.nombreReto = nombreReto;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.deporte = deporte;
+        this.tipoReto = tipoReto;
+        this.usuarioCreador = usuarioCreador;
+    }
 
-	public TipoReto getTipoReto() {
-		return tipoReto;
-	}
+    // Getters y setters
+    public long getId() {
+        return id;
+    }
 
-	public void setTipoReto(TipoReto tipoReto) {
-		this.tipoReto = tipoReto;
-	}	
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public String getNombreReto() {
-		return nombreReto;
-	}
+    public String getNombreReto() {
+        return nombreReto;
+    }
 
-	public void setNombreReto(String nombreReto) {
-		this.nombreReto = nombreReto;
-	}
+    public void setNombreReto(String nombreReto) {
+        this.nombreReto = nombreReto;
+    }
 
-	public List<Usuario> getUsuarios() {
-		return usuarios;
-	}
+    public long getFechaInicio() {
+        return fechaInicio;
+    }
 
-	public void setUsuarios(List<Usuario> usuarios) {
-		this.usuarios = usuarios;
-	}
+    public void setFechaInicio(long fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
 
-	public Usuario getUsuario() {
-		return usuario;
-	}
+    public long getFechaFin() {
+        return fechaFin;
+    }
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
+    public void setFechaFin(long fechaFin) {
+        this.fechaFin = fechaFin;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(deporte, fechaFin, fechaInicio, id, nombreReto, tipoReto, usuario, usuarios);
-	}
+    public Deporte getDeporte() {
+        return deporte;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Reto other = (Reto) obj;
-		return deporte == other.deporte && fechaFin == other.fechaFin && fechaInicio == other.fechaInicio
-				&& id == other.id && Objects.equals(nombreReto, other.nombreReto) && tipoReto == other.tipoReto
-				&& Objects.equals(usuario, other.usuario) && Objects.equals(usuarios, other.usuarios);
-	}
-	
-	
+    public void setDeporte(Deporte deporte) {
+        this.deporte = deporte;
+    }
 
-	
+    public TipoReto getTipoReto() {
+        return tipoReto;
+    }
 
-	
-	
-	
-	
-	
-	
-	
-	
+    public void setTipoReto(TipoReto tipoReto) {
+        this.tipoReto = tipoReto;
+    }
 
+    public Usuario getUsuarioCreador() {
+        return usuarioCreador;
+    }
+
+    public void setUsuarioCreador(Usuario usuarioCreador) {
+        this.usuarioCreador = usuarioCreador;
+    }
+
+    public List<Usuario> getUsuariosAceptados() {
+        return usuariosAceptados;
+    }
+
+    public void setUsuariosAceptados(List<Usuario> usuariosAceptados) {
+        this.usuariosAceptados = usuariosAceptados;
+    }
+
+    public List<Usuario> getUsuariosCompletados() {
+        return usuariosCompletados;
+    }
+
+    public void setUsuariosCompletados(List<Usuario> usuariosCompletados) {
+        this.usuariosCompletados = usuariosCompletados;
+    }
 }

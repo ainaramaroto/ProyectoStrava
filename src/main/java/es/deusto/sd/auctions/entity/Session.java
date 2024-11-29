@@ -2,15 +2,51 @@ package es.deusto.sd.auctions.entity;
 
 import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "Sesiones")
 public class Session {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+	@Column(nullable = false, unique = false)
 	private String titulo;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, unique = false)
 	private Deporte deporte;
+	
+	@Column(nullable = false, unique = false)
 	private float distancia;
+	
+	@Column(nullable = false, unique = false)
 	private long horaInicio;
+	
+	@Column(nullable = false, unique = false)
 	private long horaFin;
+	
+	@Column(nullable = false, unique = false)
 	private float duracion;
+	
+	@ManyToOne
+	@JoinColumn(name = "reto_id", nullable = true)
+	private Reto reto;
+	
+	@ManyToOne
+	@JoinColumn(name = "usuario_id", nullable = false)
 	private Usuario usuario;
+
 	
 	public Session() {
 		super();

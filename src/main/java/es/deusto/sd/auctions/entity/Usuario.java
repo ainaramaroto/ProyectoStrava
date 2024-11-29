@@ -6,24 +6,71 @@
 package es.deusto.sd.auctions.entity;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "Usuarios")
 public class Usuario {
-	private String nombre;
-	private String nombreUsuario;
-	private String contrasenia;
-	private String email;
-	private long fechaNac;
-	private float pesoKg;
-	private int altura;
-	private int frecuenciaCardiacaMax;
-	private int frecuenciaCardiacaRep;
-	private List<Session> listaSesionEntrenamiento = new ArrayList<>();
-	private List<Reto> listadeRetosCreados = new ArrayList<>();
-	private List<Reto> listaRetosCompletados = new ArrayList<>();
-	private List<Reto> listaRetosAceptados = new ArrayList<>();
-	private TipoRegistro registro;
+	
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = false)
+    private String nombre;
+
+    @Column(nullable = false, unique = true)
+    private String nombreUsuario;
+
+    @Column(nullable = false, unique = false)
+    private String contrasenia;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = false)
+    private long fechaNac;
+
+    @Column(nullable = true, unique = false)
+    private float pesoKg;
+
+    @Column(nullable = true, unique = false)
+    private int altura;
+
+    @Column(nullable = true, unique = false)
+    private int frecuenciaCardiacaMax;
+
+    @Column(nullable = true, unique = false)
+    private int frecuenciaCardiacaRep;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Session> listaSesionEntrenamiento = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Reto> listadeRetosCreados = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Reto> listaRetosCompletados = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Reto> listaRetosAceptados = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = false)
+    private TipoRegistro registro;
 
 	
 	public boolean checkPassword(String contrasenia) {

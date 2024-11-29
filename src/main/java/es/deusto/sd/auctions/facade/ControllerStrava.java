@@ -273,7 +273,7 @@ public class ControllerStrava {
 
 	}
 	
-	//Añadir un reto --> PREGUNTAR
+	//Añadir un reto
 	@Operation(summary = "Añadir un nuevo reto", description = "Permite a un usuario crear un nuevo reto.", responses = {
 			@ApiResponse(responseCode = "201", description = "Created: Reto creado correctamente"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Usuario no autenticado"),

@@ -1,5 +1,7 @@
 package es.deusto.sd.auctions.entity;
 
-public enum Deporte {
+import java.io.Serializable;
+
+public enum Deporte implements Serializable {
 	ciclismo, running
 }

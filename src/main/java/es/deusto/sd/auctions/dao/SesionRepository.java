@@ -5,3 +5,4 @@ import es.deusto.sd.auctions.entity.Session;
 public interface SesionRepository extends JpaRepository<Session, Long> {
 
 }
+

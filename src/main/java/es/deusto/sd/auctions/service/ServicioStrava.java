@@ -7,6 +7,7 @@ package es.deusto.sd.auctions.service;
 
 import java.security.SecureRandom;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,20 +40,21 @@ public class ServicioStrava {
 		this.retoRepository = retoRepository;
 		this.sesionRepository = sesionRepository;
 	}
-	public Reto getReto(Long id) {
-		return mRetos.get(id);
-	}
 	
 	public List<Reto> getRetos() {
 		return retoRepository.findAll();
 	}
 	
+	public Reto getReto(Long id) {
+		return mRetos.get(id);
+	}
+	
 	public List<Usuario> getRetosPorID(long ID) {
-		Optional<Reto> retos = retoRepository.findByID(ID);
+		Optional<Reto> retos = retoRepository.findByid(ID);
 		if(retos.isEmpty()) {
 			 throw new RuntimeException("Retos not found");
         }
-		return retos.get().getUsuarios();
+		return retos.get().getUsuariosAceptados();
 	}
 
 	public Usuario getUsuarioPorNombreUsuario(String nobre) {
@@ -60,11 +62,11 @@ public class ServicioStrava {
 		}
 	
 	public boolean aceptarReto(Usuario u,Reto r) {
-		if (r.getUsuarios().contains(u)) {
+		if (r.getUsuariosAceptados().contains(u)) {
 	        return false;
 	    }
-		if(r != null && !r.getUsuarios().contains(u)) {
-			r.getUsuarios().add(u);
+		if(r != null && !r.getUsuariosAceptados().contains(u)) {
+			r.getUsuariosAceptados().add(u);
 			u.getListaRetosAceptados().add(r);
 			return true;
 		}
@@ -74,7 +76,7 @@ public class ServicioStrava {
 
 	public void aniadirReto(Usuario u, String nombre, long fechainicio,long fechaFin, Deporte d, TipoReto tr) {
 		long id = IdReto++; // Generar un nuevo id único
-		Reto reto = new Reto(id, nombre, fechainicio, fechaFin, d, tr, u, new ArrayList<>());
+		Reto reto = new Reto( nombre, fechainicio, fechaFin, d, tr, u);
 		u.getListadeRetosCreados().add(reto);
 		mRetos.put(reto.getId(), reto);
 	}
@@ -93,13 +95,13 @@ public class ServicioStrava {
 	
 	public List<Reto> getUltimos5Reto(Usuario u) {
 	    return mRetos.values().stream()
-	            .filter(reto -> reto.getUsuario().equals(u)) // Filtrar retos del usuario dado
+	            .filter(reto -> reto.getUsuarioCreador().equals(u)) // Filtrar retos del usuario dado
 	            .sorted((r1, r2) -> Long.compare(r2.getFechaInicio(), r1.getFechaInicio())) // Ordenar por fecha de inicio descendente
 	            .limit(5) // Limitar a los últimos 5
 	            .collect(Collectors.toList());
 		
 		//HECHO CON CHATGPT
-		/*Este método devuelve los últimos 5 retos añadidos, 
+		/*Este método devuelve los últimos 5 retos creados, 
 		 * ordenados por la fecha de inicio en orden descendente.
 		 * */
 	} 
@@ -107,12 +109,13 @@ public class ServicioStrava {
 	public List<Reto> getRetosAceptadosPorUsuario(Usuario u){
 		List<Reto> retos = new ArrayList<>();
 		for (Reto r: mRetos.values()) {
-			if(r.getUsuario().equals(u)) {
+			if(r.getUsuarioCreador().equals(u)) {
 				retos.add(r);
 			}
 		}
 		return retos;
 	}
+	
 	public List<Reto> getRetosPorDeporte(Deporte deporte) {
 		List<Reto> retos = new ArrayList<>();
 		for(Reto r: mRetos.values()) {

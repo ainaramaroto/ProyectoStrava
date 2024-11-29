@@ -1,5 +1,7 @@
 package es.deusto.sd.auctions.entity;
 
-public enum TipoRegistro {
+import java.io.Serializable;
+
+public enum TipoRegistro implements Serializable {
 	GOOGLE, META
 }

@@ -7,8 +7,11 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Component
 public class CurrencyServiceGateway implements ICurrencyServiceGateway{
 
 	 private final String API_URL = "https://api.freecurrencyapi.com/v1/latest";

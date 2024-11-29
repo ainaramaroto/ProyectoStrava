@@ -6,6 +6,7 @@
 package es.deusto.sd.auctions;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import es.deusto.sd.auctions.entity.TipoRegistro;
 import es.deusto.sd.auctions.entity.TipoReto;
 import es.deusto.sd.auctions.entity.Usuario;
 import es.deusto.sd.auctions.service.ServicioStrava;
+import jakarta.transaction.Transactional;
 import es.deusto.sd.auctions.service.ServicioAutorizacion;
 
 @Configuration
@@ -32,8 +34,12 @@ public class DataInitializer {
 	private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 	
     @Bean
+    @Transactional
     CommandLineRunner initData(UsuarioRepository usuarioRepository, RetoRepository retoRepository, SesionRepository sesionRepository) {
-		return args -> {			
+		return args -> {
+			if (usuarioRepository.count() > 0) {                
+                return;
+            }	
 			// Create some users
 				
 			
@@ -49,10 +55,10 @@ public class DataInitializer {
 			
 			// Create some retos y sesiones
 			
-			Reto r1= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.TIEMPO, ainara,new ArrayList<Usuario>());
-			Reto r2= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, gorka,new ArrayList<Usuario>());
-			Reto r3= new Reto(1, "reto1", 10000,20000, Deporte.running,TipoReto.TIEMPO, ander,new ArrayList<Usuario>());
-			Reto r4= new Reto(1, "reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, naroa,new ArrayList<Usuario>());
+			Reto r1= new Reto("reto1", 10000,20000, Deporte.ciclismo,TipoReto.TIEMPO, ainara);
+			Reto r2= new Reto("reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, gorka);
+			Reto r3= new Reto("reto1", 10000,20000, Deporte.running,TipoReto.TIEMPO, ander);
+			Reto r4= new Reto("reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, naroa);
 			
 			retoRepository.saveAll(List.of(r1, r2, r3,r4));
             logger.info("Retos saved!");						
