@@ -8,4 +8,5 @@ import es.deusto.sd.auctions.entity.Reto;
 
 public interface RetoRepository extends JpaRepository<Reto, Long>{
 	Optional<Reto> findByID(long id);
+	
 }
