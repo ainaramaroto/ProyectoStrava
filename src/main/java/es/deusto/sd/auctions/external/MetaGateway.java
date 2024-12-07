@@ -12,11 +12,11 @@ public class MetaGateway implements AutorizacionGateway{
 	    private static final int PORT = 8081;
 	    @Override
 	    public Optional<Boolean> validarEmail(String email) {
-	        return Optional.of(sendRequest("VALIDATE_EMAIL " + email).equals("EMAIL_VALID"));
+	        return Optional.of(sendRequest("VALIDAR EMAIL " + email).equals("EMAIL_VALIDO"));
 	    }
 	    @Override
 	    public Optional<Boolean> validarContrasenia(String email, String contrasenia) {
-	        return Optional.of(sendRequest("VALIDATE_PASSWORD " + email + " " + contrasenia).equals("PASSWORD_VALID"));
+	        return Optional.of(sendRequest("VALIDAR_CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
 	    }
 
 	    

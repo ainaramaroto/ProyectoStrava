@@ -40,7 +40,7 @@ public class AutorizacionGoogleGateway implements AutorizacionGateway {
     @Override
 	public Optional<Boolean> validarContrasenia(String email, String contrasenia) {
 		
-		String url = API_URL + "?email=" + email + "&password=" + contrasenia;
+		String url = API_URL + "?email=" + email + "&contrasenia=" + contrasenia;
         try {
             // Crear el request
             HttpRequest request = HttpRequest.newBuilder()

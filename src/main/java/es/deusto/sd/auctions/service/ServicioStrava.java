@@ -5,9 +5,6 @@
  */
 package es.deusto.sd.auctions.service;
 
-import java.security.SecureRandom;
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,7 +139,7 @@ public class ServicioStrava {
 	
 	public List<Session> sesionporUsuario(Usuario u){
 		List<Session> sesiones = new ArrayList<>();
-		for(Session s: mSesiones.values()) {
+		for(Session s: sesionRepository.findAll()) {
 			if(s.getUsuario().equals(u)) {
 				sesiones.add(s);
 			}
@@ -152,7 +149,7 @@ public class ServicioStrava {
 	
 	public List<Session> sesionesPorFecha(long horaInicio, long horaFin){
 		List<Session> sesiones = new ArrayList<>();
-		for(Session s: mSesiones.values()) {
+		for(Session s: sesionRepository.findAll()) {
 			if((s.getHoraInicio() == horaInicio) && (s.getHoraFin() == horaFin)) {
 				sesiones.add(s);
 			}
