@@ -56,7 +56,7 @@ public class Reto {
     )
     private List<Usuario> usuariosCompletados = new ArrayList<>();
     
-    @ManyToOne
+    @ManyToMany
     @JoinColumn(name = "usuario_id", nullable = true) // Relación con Usuario
     private Usuario usuario;
 
