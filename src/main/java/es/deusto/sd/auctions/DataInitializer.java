@@ -42,7 +42,7 @@ public class DataInitializer {
             }	
 			// Create some users
 				
-			
+			//Usuario u = new Usuario("nombre", "nombreUsuario", "Contrasenia", "Email", 0, 0, 0, 0, 0, null, null, null, null, Tipo de registro)
 			Usuario naroa = new Usuario("Naroa", "naroaAzcona", "1", "naroa.azcona@gmail.com",10000, 59, 168, 70,66, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.GOOGLE);
 			Usuario ander = new Usuario("Ander", "anderGonzalez", "1", "ander.gonzalez@gmail.com", 10000, 56, 80,162, 80, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.META);
 			Usuario gorka = new Usuario("Gorka", "gorkaOrtuzar", "1", "gorka.ortuzar@gmail.com", 100001, 65, 170,50 ,100, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TipoRegistro.GOOGLE);
