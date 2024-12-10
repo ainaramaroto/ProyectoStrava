@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import es.deusto.sd.auctions.dao.UsuarioRepository;
 import es.deusto.sd.auctions.entity.Usuario;
+import es.deusto.sd.auctions.external.ServiceGatewayFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +23,9 @@ public class ServicioAutorizacion {
     
     public Optional<String> login(String email, String contrasenia) {
     	  Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-        
-        if (usuario != null && usuario.get().checkPassword(contrasenia)) {
-            String token = generateToken();  
+    	  String token="";
+    	  if (ServiceGatewayFactory.getInstance().createGateway(usuario.get().getRegistro().toString().toLowerCase()).validarContrasenia(email, contrasenia).get()) {
+            token = generateToken();  
             tokenStore.put(token, usuario.get());    
             return Optional.of(token);
         } else {
@@ -43,7 +44,14 @@ public class ServicioAutorizacion {
         }
     }
     
-   
+    public Usuario getUserByEmail(String email) {
+		if (!usuarioRepository.findByEmail(email).isPresent()) {
+			return null;
+		}else {
+		return usuarioRepository.findByEmail(email).get();
+		}
+	}
+    
     public Usuario getUserByToken(String token) {
         return tokenStore.get(token); 
     }
