@@ -1,6 +1,6 @@
 package es.deusto.sd.auctions.external;
 
-
+import es.deusto.sd.auctions.entity.TipoRegistro;
 
 public class ServiceGatewayFactory {
 	
@@ -14,14 +14,13 @@ public class ServiceGatewayFactory {
 		
 	}
 
-    public AutorizacionGateway createGateway(String provider) {
-        switch (provider.toLowerCase()) {
-            case "meta":
+    public AutorizacionGateway createGateway(TipoRegistro tr) {
+        if (tr.equals(TipoRegistro.META)){
                 return new MetaGateway();
-            case "google":
+        }else if(tr.equals(TipoRegistro.GOOGLE)){
                 return new AutorizacionGoogleGateway();
-            default:
-                throw new IllegalArgumentException("Unsupported provider: " + provider);
+        }else {
+                throw new IllegalArgumentException("Unsupported provider: " + tr);
         }
     }
 }

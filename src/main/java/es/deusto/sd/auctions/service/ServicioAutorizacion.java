@@ -3,7 +3,9 @@ package es.deusto.sd.auctions.service;
 import org.springframework.stereotype.Service;
 
 import es.deusto.sd.auctions.dao.UsuarioRepository;
+import es.deusto.sd.auctions.entity.TipoRegistro;
 import es.deusto.sd.auctions.entity.Usuario;
+import es.deusto.sd.auctions.external.AutorizacionGateway;
 import es.deusto.sd.auctions.external.ServiceGatewayFactory;
 
 import java.util.HashMap;
@@ -24,7 +26,9 @@ public class ServicioAutorizacion {
     public Optional<String> login(String email, String contrasenia) {
     	  Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
     	  String token="";
-    	  if (ServiceGatewayFactory.getInstance().createGateway(usuario.get().getRegistro().toString().toLowerCase()).validarContrasenia(email, contrasenia).get()) {
+    	  TipoRegistro tr= TipoRegistro.valueOf(usuario.get().getRegistro().toString()) ;
+    	  AutorizacionGateway sgf= ServiceGatewayFactory.getInstance().createGateway(tr);
+    	if(sgf.validarContrasenia(email, contrasenia).get()){
             token = generateToken();  
             tokenStore.put(token, usuario.get());    
             return Optional.of(token);
