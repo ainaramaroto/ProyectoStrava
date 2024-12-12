@@ -69,10 +69,10 @@ public class ServicioStrava {
 		}
 		return false;
 	}
-	private long IdReto = 0;
+
 
 	public void aniadirReto(Usuario u, String nombre, long fechainicio,long fechaFin, Deporte d, TipoReto tr) {
-		long id = IdReto++; // Generar un nuevo id único
+
 		Reto reto = new Reto( nombre, fechainicio, fechaFin, d, tr, u);
 		u.getListadeRetosCreados().add(reto);
 		mRetos.put(reto.getId(), reto);
