@@ -14,14 +14,29 @@ public class ServiceGatewayFactory {
 		
 	}
 
-    public AutorizacionGateway createGateway(TipoRegistro tr) {
-        if (tr.equals(TipoRegistro.META)){
-                return new MetaGateway();
-        }else if(tr.equals(TipoRegistro.GOOGLE)){
-                return new AutorizacionGoogleGateway();
-        }else {
-                throw new IllegalArgumentException("Unsupported provider: " + tr);
-        }
-    }
+	
+	 public AutorizacionGateway createGateway(String provider) {
+	        switch (provider.toLowerCase()) {
+	            case "meta":
+	                return new MetaGateway();
+	            case "google":
+	                return new AutorizacionGoogleGateway();
+	            default:
+	                throw new IllegalArgumentException("Unsupported provider: " + provider);
+	        }
+	    }
+	
+	
+	
+	
+//    public AutorizacionGateway createGateway(TipoRegistro tr) {
+//        if (tr.equals(TipoRegistro.META)){
+//                return new MetaGateway();
+//        }else if(tr.equals(TipoRegistro.GOOGLE)){
+//                return new AutorizacionGoogleGateway();
+//        }else {
+//                throw new IllegalArgumentException("Unsupported provider: " + tr);
+//        }
+//    }
 }
 

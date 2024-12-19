@@ -23,19 +23,50 @@ public class ServicioAutorizacion {
     }
   
     
-    public Optional<String> login(String email, String contrasenia) {
-    	  Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-    	  String token="";
-    	  TipoRegistro tr= TipoRegistro.valueOf(usuario.get().getRegistro().toString()) ;
-    	  AutorizacionGateway sgf= ServiceGatewayFactory.getInstance().createGateway(tr);
-    	if(sgf.validarContrasenia(email, contrasenia).get()){
-            token = generateToken();  
-            tokenStore.put(token, usuario.get());    
-            return Optional.of(token);
+    
+    
+    
+    public Optional<String> login(String email, String password) {
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
+
+        if (usuarioOptional.isPresent()) {
+            Usuario usuario = usuarioOptional.get(); // Obtener el usuario
+
+            // Crear el gateway
+            String registro = usuario.getRegistro().toString().toLowerCase();
+            Optional<Boolean> esContraseniaValida = ServiceGatewayFactory.getInstance()
+                .createGateway(registro)
+                .validarContrasenia(email, password);
+
+            // Comprobar si la contraseña es válida
+            if (esContraseniaValida.isPresent() && esContraseniaValida.get()) {
+                String token = generateToken(); 
+                tokenStore.put(token, usuario); 
+                return Optional.of(token); 
+            } else {
+                System.out.println("Contraseña inválida o no se pudo validar.");
+                return Optional.empty(); 
+            }
         } else {
-        	return Optional.empty();
+            System.out.println("Usuario no encontrado.");
+            return Optional.empty(); 
         }
     }
+
+    
+//    public Optional<String> login(String email, String contrasenia) {
+//    	  Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+//    	  String token="";
+//    	  Titr= TipoRegistro.valueOf(usuario.get().getRegistro()) ;
+//    	  AutorizacionGateway sgf= ServiceGatewayFactory.getInstance().createGateway(tr);
+//    	if(sgf.validarContrasenia(email, contrasenia).orElse(false)){
+//            token = generateToken();  
+//            tokenStore.put(token, usuario.get());    
+//            return Optional.of(token);
+//        } else {
+//        	return Optional.empty();
+//        }
+//    }
     
     // Logout method to remove the token from the session store
     public Optional<Boolean> logout(String token) {

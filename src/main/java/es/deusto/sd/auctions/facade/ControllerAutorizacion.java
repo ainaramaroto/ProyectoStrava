@@ -1,12 +1,6 @@
-/**
- * This code is based on solutions provided by ChatGPT 4o and 
- * adapted using GitHub Copilot. It has been thoroughly reviewed 
- * and validated to ensure correctness and that it is free of errors.
- */
 package es.deusto.sd.auctions.facade;
 
 import java.util.Optional;
-
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,57 +21,50 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Controller de autorización", description = "Operaciones de registro, login y logout")
 public class ControllerAutorizacion {
 
-    private ServicioAutorizacion servicioAutorizacion;
-    
-	public ControllerAutorizacion(ServicioAutorizacion authService) {
-		this.servicioAutorizacion = authService;
-	}
-    
-	   
-    // Login endpoint
+    private final ServicioAutorizacion servicioAutorizacion;
+
+    public ControllerAutorizacion(ServicioAutorizacion authService) {
+        this.servicioAutorizacion = authService;
+    }
+
+    // Endpoint de Login
     @Operation(
-        summary = "Login to the system",
-        description = "Allows a user to login by providing email and password. Returns a token if successful.",
+        summary = "Login en el sistema",
+        description = "Permite a un usuario iniciar sesión proporcionando su correo electrónico y contraseña. Devuelve un token si es exitoso.",
         responses = {
-        		//200 = The request succeeded
-        		//401 = Although the HTTP standard specifies "unauthorized", semantically this response means "unauthenticated".
-            @ApiResponse(responseCode = "200", description = "OK: Login successful, returns a token"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials, login failed"),
+            @ApiResponse(responseCode = "200", description = "OK: Inicio de sesión exitoso, devuelve un token"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Credenciales inválidas, inicio de sesión fallido"),
         }
     )
     @PostMapping("/login")
     public ResponseEntity<String> login(
-    		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
-    		@RequestBody CredencialesDTO credentials) {    	
+            @Parameter(name = "credentials", description = "Credenciales del usuario", required = true)
+            @RequestBody CredencialesDTO credentials) {
+
         Optional<String> token = servicioAutorizacion.login(credentials.getEmail(), credentials.getContrasenia());
-        
-    	if (token.isPresent()) {
-    		return new ResponseEntity<>(token.get(), HttpStatus.OK);
-    	} else {
-    		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    	}
+
+        return token.map(t -> new ResponseEntity<>(t, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
     }
 
-    // Logout endpoint
+    // Endpoint de Logout
     @Operation(
-        summary = "Logout from the system",
-        description = "Allows a user to logout by providing the authorization token.",
+        summary = "Logout del sistema",
+        description = "Permite a un usuario cerrar sesión proporcionando el token de autorización.",
         responses = {
-        		//204 = There is no content to send for this request, but the headers are useful. The user agent may update its cached headers for this resource with the new ones.
-            @ApiResponse(responseCode = "204", description = "No Content: Logout successful"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"),
+            @ApiResponse(responseCode = "204", description = "No Content: Cierre de sesión exitoso"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Token inválido, cierre de sesión fallido"),
         }
-    )    
-    @PostMapping("/logout")    
+    )
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-    		@Parameter(name = "token", description = "Authorization token", required = true, example = "Bearer 1924888a05c")
-    		@RequestBody String token) {    	
+            @Parameter(name = "token", description = "Token de autorización", required = true, example = "Bearer 1924888a05c")
+            @RequestBody String token) {
+
         Optional<Boolean> result = servicioAutorizacion.logout(token);
-    	
-        if (result.isPresent() && result.get()) {
-        	return new ResponseEntity<>(HttpStatus.NO_CONTENT);	
-        } else {
-        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }        
+
+        return result.filter(Boolean::booleanValue)
+                     .map(r -> new ResponseEntity<Void>(HttpStatus.NO_CONTENT))
+                     .orElseGet(() -> new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED));
     }
 }
