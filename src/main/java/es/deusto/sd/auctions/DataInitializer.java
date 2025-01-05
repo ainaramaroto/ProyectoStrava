@@ -52,7 +52,7 @@ public class DataInitializer {
 			
 			
 			logger.info("Users saved!");
-			
+			logger.info("Usuarios:" + usuarioRepository.findAll());
 			// Create some retos y sesiones
 			
 			Reto r1= new Reto("reto1", 10000,20000, Deporte.ciclismo,TipoReto.TIEMPO, ainara);
@@ -61,7 +61,10 @@ public class DataInitializer {
 			Reto r4= new Reto("reto1", 10000,20000, Deporte.ciclismo,TipoReto.DISTANCIA, naroa);
 			
 			retoRepository.saveAll(List.of(r1, r2, r3,r4));
-            logger.info("Retos saved!");						
+            logger.info("Retos saved!");
+			logger.info("Retos:" + retoRepository.findAll());
+
+            
 
 			Session s1 = new Session(0, "Sesion1", Deporte.ciclismo, 70, 3000, 5000, 240, ainara);
 			Session s2 = new Session(0, "Sesion2", Deporte.running, 10, 4000, 4050, 30, gorka);
@@ -69,8 +72,9 @@ public class DataInitializer {
 			Session s4 = new Session(0, "Sesion4", Deporte.running, 20, 6000, 8000, 80, ander);
 			
 			sesionRepository.saveAll(List.of(s1, s2, s3,s4));
-            logger.info("Retos saved!");
-            logger.info("Sessions saved!");						
+            logger.info("Sessions saved!");	
+			logger.info("Sesiones:" + usuarioRepository.findAll());
+
 		};
 	}
 }

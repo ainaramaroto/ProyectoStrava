@@ -24,7 +24,7 @@ public class ServicioAutorizacion {
   
     
     
-    
+ 
     
     public Optional<String> login(String email, String password) {
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
