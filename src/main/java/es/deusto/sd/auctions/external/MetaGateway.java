@@ -16,9 +16,9 @@ public class MetaGateway implements AutorizacionGateway{
 	    }
 	    @Override
 	    public Optional<Boolean> validarContrasenia(String email, String contrasenia) {
-	        System.out.println(sendRequest("VALIDAR_CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
+	        System.out.println(sendRequest("VALIDAR CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
 
-	        return Optional.of(sendRequest("VALIDAR_CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
+	        return Optional.of(sendRequest("VALIDAR CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
 	    }
 
 	    
