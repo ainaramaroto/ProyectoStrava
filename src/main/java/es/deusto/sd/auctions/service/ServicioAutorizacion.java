@@ -38,7 +38,7 @@ public class ServicioAutorizacion {
             Optional<Boolean> esContraseniaValida = ServiceGatewayFactory.getInstance()
                 .createGateway(registro)
                 .validarContrasenia(email, password);
-            	System.out.println(esContraseniaValida);
+            	System.out.println("Comprobar :" + esContraseniaValida);
             // Comprobar si la contraseña es válida
             if (esContraseniaValida.isPresent() && esContraseniaValida.get()) {
                 String token = generateToken(); 

@@ -1,9 +1,11 @@
 package es.deusto.sd.auctions.external;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class AutorizacionGoogleGateway implements AutorizacionGateway {
@@ -58,6 +60,39 @@ public class AutorizacionGoogleGateway implements AutorizacionGateway {
         	return Optional.empty();
         }  
 	}
+
+//    @Override
+//    public Optional<Boolean> validarContrasenia(String email, String contrasenia) {
+//        try {
+//            // Codificar los parámetros
+//            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+//            String encodedContrasenia = URLEncoder.encode(contrasenia, StandardCharsets.UTF_8);
+//            String url = API_URL + "?email=" + encodedEmail + "&contrasenia=" + encodedContrasenia;
+//
+//            // Crear el cliente HTTP
+//            HttpRequest request = HttpRequest.newBuilder()
+//                    .uri(URI.create(url))
+//                    .GET()
+//                    .build();
+//
+//            // Enviar la solicitud
+//            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//            // Verificar la respuesta
+//            if (response.statusCode() == 200) {
+//                System.out.println("Respuesta válida: " + response.body());
+//                return Optional.of(true);
+//            } else {
+//                System.err.println("Código de estado inesperado: " + response.statusCode());
+//                System.err.println("Cuerpo de la respuesta: " + response.body());
+//                return Optional.of(false);
+//            }
+//        } catch (Exception ex) {
+//            System.err.println("Error al validar la contraseña: " + ex.getMessage());
+//            ex.printStackTrace();
+//            return Optional.empty();
+//        }
+//    }
 
 	
 }
