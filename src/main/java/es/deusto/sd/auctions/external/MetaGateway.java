@@ -16,6 +16,8 @@ public class MetaGateway implements AutorizacionGateway{
 	    }
 	    @Override
 	    public Optional<Boolean> validarContrasenia(String email, String contrasenia) {
+	        System.out.println(sendRequest("VALIDAR_CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
+
 	        return Optional.of(sendRequest("VALIDAR_CONTRASENIA " + email + " " + contrasenia).equals("CONTRASENIA_VALIDA"));
 	    }
 
@@ -25,7 +27,9 @@ public class MetaGateway implements AutorizacionGateway{
 	             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 	             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 	            out.println(request);
-	            return in.readLine(); // Lee la respuesta del servidor
+	            String respuesta = in.readLine();
+	            System.out.println("Respuesta del servidor: " + respuesta);
+	            return respuesta; // Lee la respuesta del servidor
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	            return "ERROR";
