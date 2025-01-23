@@ -19,7 +19,7 @@ public class Session {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	@Column(nullable = false, unique = false)
 	private String titulo;
 	
@@ -53,7 +53,7 @@ public class Session {
 	}
 
 	public Session(long id, String titulo, Deporte deporte, float distancia, long horaInicio, long horaFin,
-			float duracion, Usuario usuario) {
+			float duracion,Reto reto ,Usuario usuario) {
 		super();
 		this.id = id;
 		this.titulo = titulo;
@@ -62,14 +62,15 @@ public class Session {
 		this.horaInicio = horaInicio;
 		this.horaFin = horaFin;
 		this.duracion = duracion;
+		this.reto = reto;
 		this.usuario = usuario;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -129,9 +130,22 @@ public class Session {
 		this.usuario = usuario;
 	}
 
+	
+	public Reto getReto() {
+		return reto;
+	}
+
+	public void setReto(Reto reto) {
+		this.reto = reto;
+	}
+
+	public void setDuracion(float duracion) {
+		this.duracion = duracion;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(deporte, distancia, duracion, horaFin, horaInicio, id, titulo, usuario);
+		return Objects.hash(deporte, distancia, duracion, horaFin, horaInicio, id, titulo, usuario, reto);
 	}
 
 	@Override

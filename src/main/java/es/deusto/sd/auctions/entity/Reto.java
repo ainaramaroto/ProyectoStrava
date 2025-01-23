@@ -1,26 +1,19 @@
 package es.deusto.sd.auctions.entity;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+
 @Entity
 @Table(name = "Retos")
 public class Reto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, unique = false)
     private String nombreReto;
@@ -46,19 +39,27 @@ public class Reto {
 
     // Usuarios que han aceptado este reto
     @ManyToMany
-    @JoinTable(name = "usuario_retos_aceptados",joinColumns = @JoinColumn(name = "reto_id"),inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    @JoinTable(name = "usuario_retos_aceptados",
+        joinColumns = @JoinColumn(name = "reto_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
     private List<Usuario> usuariosAceptados = new ArrayList<>();
 
     // Usuarios que han completado este reto
     @ManyToMany
-    @JoinTable(name = "usuario_retos_completados",joinColumns = @JoinColumn(name = "reto_id"),inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    @JoinTable(name = "usuario_retos_completados",
+        joinColumns = @JoinColumn(name = "reto_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
     private List<Usuario> usuariosCompletados = new ArrayList<>();
     
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true) // Relación con Usuario
     private Usuario usuario;
+
+    // Lista de sesiones asociadas al reto
+    @OneToMany(mappedBy = "reto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Session> sesiones = new ArrayList<>();
 
     // Constructor vacío
     public Reto() {}
@@ -144,5 +145,23 @@ public class Reto {
 
     public void setUsuariosCompletados(List<Usuario> usuariosCompletados) {
         this.usuariosCompletados = usuariosCompletados;
+    }
+
+    public List<Session> getSesiones() {
+        return sesiones;
+    }
+
+    public void setSesiones(List<Session> sesiones) {
+        this.sesiones = sesiones;
+    }
+
+    public void addSesion(Session sesion) {
+        this.sesiones.add(sesion);
+        sesion.setReto(this); // Actualizar la relación inversa
+    }
+
+    public void removeSesion(Session sesion) {
+        this.sesiones.remove(sesion);
+        sesion.setReto(null); // Eliminar la relación inversa
     }
 }

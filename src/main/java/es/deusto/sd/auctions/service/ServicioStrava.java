@@ -7,6 +7,7 @@ package es.deusto.sd.auctions.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,12 +39,32 @@ public class ServicioStrava {
 		this.sesionRepository = sesionRepository;
 	}
 	
+	public Optional<Session> getDetalleSesion(Long id) {
+		    try {
+		        System.out.println("Buscando sesión con ID: " + id);
+		        return sesionRepository.findById(id);
+		        } catch (Exception e) {
+		        System.err.println("Error al buscar la sesión: " + e.getMessage());
+		        throw new RuntimeException("Error al obtener detalles de la sesión", e);
+		        }
+    }
+	
+	public Optional<Reto> getDetalleReto(Long id) {
+		 try {
+		        System.out.println("Buscando reto con ID: " + id);
+		        return retoRepository.findById(id);
+		    } catch (Exception e) {
+		        System.err.println("Error al buscar el reto: " + e.getMessage());
+		        throw new RuntimeException("Error al obtener detalles del reto", e);
+		    }
+	}
+	
 	public List<Reto> getRetos() {
 		return retoRepository.findAll();
 	}
 	
-	public Reto getReto(Long id) {
-		return mRetos.get(id);
+	public Optional<Reto> getReto(Long id) {
+		return retoRepository.findByid(id);
 	}
 	
 	public List<Usuario> getRetosPorID(long ID) {
@@ -75,7 +96,7 @@ public class ServicioStrava {
 
 		Reto reto = new Reto( nombre, fechainicio, fechaFin, d, tr, u);
 		u.getListadeRetosCreados().add(reto);
-		mRetos.put(reto.getId(), reto);
+		retoRepository.save(reto);
 	}
 	
 	
@@ -161,9 +182,9 @@ public class ServicioStrava {
 	
 	private long IdSesion = 0;
 
-	public void aniadirSesion(Usuario u, String titulo, Deporte deporte, float distancia, long horaInicio, long horaFin, float duracion) {
+	public void aniadirSesion(Usuario u, Reto r,String titulo, Deporte deporte, float distancia, long horaInicio, long horaFin, float duracion) {
 	    long id = IdSesion++; // Generar un nuevo id único
-	    Session sesion = new Session(id, titulo, deporte, distancia, horaInicio, horaFin, duracion, u);
+	    Session sesion = new Session(id, titulo, deporte, distancia, horaInicio, horaFin, duracion, r,u);
 	    mSesiones.put( id, sesion);
 	}
 	
@@ -175,6 +196,18 @@ public class ServicioStrava {
 			        .collect(Collectors.toList());
 		 
 		 //HECHO CON CHATGPT
+	}
+
+	public List<Session> getSesionesPorReto(Long retoId) {
+	    List<Session> sesiones = new ArrayList<>();
+	    for (Session s : sesionRepository.findAll()) {
+	    	System.out.println("Id de el repositorio" +s.getReto().getId());
+	    	System.out.println("Id metido por parametro" +retoId);
+	        if (s.getReto().getId()==(retoId)) {
+	            sesiones.add(s);
+	        }
+	    }
+	    return sesiones;  
 	}
 
 } 

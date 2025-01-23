@@ -9,6 +9,7 @@ import es.deusto.sd.auctions.entity.Deporte;
 import es.deusto.sd.auctions.entity.TipoReto;
 
 public class RetoDTO {
+	private Long id;
 	private String nombre;
 	private long fechaInicio;
 	private long fechaFin;
@@ -58,6 +59,16 @@ public class RetoDTO {
 	}
 	public void setDistancia(String distancia) {
 		this.distancia = distancia;
+	}
+	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public void setId(long id) {
+		this.id =id;
 	}
 	
 	

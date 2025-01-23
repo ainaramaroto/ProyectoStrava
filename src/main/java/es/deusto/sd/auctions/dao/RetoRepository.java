@@ -10,3 +10,4 @@ public interface RetoRepository extends JpaRepository<Reto, Long>{
 	Optional<Reto> findByid(long id);
 	Optional<Reto> findBynombreReto(String nombreReto);
 }
+	

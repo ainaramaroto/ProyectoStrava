@@ -8,7 +8,8 @@ package es.deusto.sd.auctions.dto;
 import es.deusto.sd.auctions.entity.Deporte;
 
 public class SessionDTO {
-	private String nombre;
+	private Long id;
+	private String titulo;
 	private Deporte deporte;
 	private long inicio;
 	private long fin;
@@ -16,11 +17,11 @@ public class SessionDTO {
 	private int distancia;
 	private String nombreUsuario;
 	
-	public String getNombre() {
-		return nombre;
+	public String gettitulo() {
+		return titulo;
 	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setTitulo(String nombre) {
+		this.titulo = nombre;
 	}
 	public long getInicio() {
 		return inicio;
@@ -57,6 +58,12 @@ public class SessionDTO {
 	}
 	public void setNombreUsuario(String nombreUsuario) {
 		this.nombreUsuario = nombreUsuario;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

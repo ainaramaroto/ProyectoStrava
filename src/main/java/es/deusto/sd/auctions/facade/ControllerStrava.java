@@ -3,6 +3,7 @@ package es.deusto.sd.auctions.facade;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -72,24 +73,136 @@ public class ControllerStrava {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
+		
+		@Operation(summary = "Obtener detalles de una sesión",
+			    description = "Devuelve los detalles completos de una sesión específica por su ID.",
+			    responses = {
+			        @ApiResponse(responseCode = "200", description = "OK: Sesión encontrada y devuelta correctamente"),
+			        @ApiResponse(responseCode = "404", description = "Not Found: Sesión no encontrada"),
+			        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+			    }
+			)
+			@GetMapping("/sesion/{sesionId}")
+			public ResponseEntity<SessionDTO> getDetalleSesion(
+			    @PathVariable(name = "sesionId") Long sesionId) {
+			    try {
+			        // Obtener la sesión del servicio
+			        Optional<Session> sesion = servicioStrava.getDetalleSesion(sesionId);
+			        
+			        if (sesion.isEmpty()) {
+			            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			        }
+
+			        // Convertir la sesión a DTO
+			        SessionDTO sesionDTO = sessionToDTO(sesion.get());
+			        return new ResponseEntity<>(sesionDTO, HttpStatus.OK);
+			        
+			    } catch (Exception e) {
+			        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			    }
+			}
+		
+		
+	
+		//Obtener todos los retos
+		@Operation(summary = "Obtener todos las sesiones",description = "Devuelve una lista con todos las sesiones.",responses = {
+		        @ApiResponse(responseCode = "200", description = "OK: Sesiones obtenidos correctamente"),
+		        @ApiResponse(responseCode = "500", description = "Error interno del servidor")})
+		@GetMapping("/sesiones")
+	    public ResponseEntity<List<SessionDTO>> getSesiones() {
+			try {
+	            List<Session> sesiones = servicioStrava.getSesiones();
+	            List<SessionDTO> sesionDTOs = new ArrayList<>();
+	            for (Session sesion : sesiones) {
+	                SessionDTO sesionDTO = sessionToDTO(sesion);
+	                sesionDTOs.add(sesionDTO);
+	            }
+	            return new ResponseEntity<>(sesionDTOs, HttpStatus.OK);
+	        } catch (Exception e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+
+		}
+		
+		
+		@Operation(summary = "Obtener sesiones de un reto",
+			    description = "Devuelve una lista con todas las sesiones asociadas a un reto específico.",
+			    responses = {
+			        @ApiResponse(responseCode = "200", description = "OK: Sesiones obtenidas correctamente"),
+			        @ApiResponse(responseCode = "404", description = "Reto no encontrado"),
+			        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+			    }
+			)
+			@GetMapping("/retos/{retoID}/sesiones")
+			public ResponseEntity<List<SessionDTO>> getSesionesPorReto(
+			    @PathVariable(name = "retoID") Long retoID) {  // Especificamos el nombre explícitamente
+			    try {
+			        // Obtener las sesiones del reto a través del servicio
+			        List<Session> sesiones = servicioStrava.getSesionesPorReto(retoID);
+
+			        if (sesiones == null || sesiones.isEmpty()) {
+			            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			        }
+
+			        // Convertir las sesiones a DTOs
+			        List<SessionDTO> sesionDTOs = sesiones.stream()
+			            .map(this::sessionToDTO)
+			            .collect(Collectors.toList());
+
+			        return new ResponseEntity<>(sesionDTOs, HttpStatus.OK);
+			    } catch (Exception e) {
+			        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			    }
+			}
+		
+		
+		
+		
+
 	
 	//Crear una sesion de entrenamiento
 	@Operation(summary = "Crear una nueva sesión de entrenamiento",description = "Permite a un usuario crear manualmente una sesión.",responses = {
 	        @ApiResponse(responseCode = "201", description = "Created: Session created successfully"),
 	        @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token"),
 	        @ApiResponse(responseCode = "500", description = "Internal server error")})
-	@PostMapping("/sessions/crear")
+	@PostMapping("/retos/{retoId}/sesiones")
 	public ResponseEntity<Void> crearSesion(
-	        @RequestParam("token") String token, 
-	        @RequestBody SessionDTO session) {
-	        Usuario u = servicioAutorizacion.getUserByToken(token);
-	        if(u == null) {
-	        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+	    @PathVariable Long retoId,
+	    @RequestBody Session sesion,
+	    @RequestParam("token") String token) {
+	    try {
+	        System.out.println("Creando sesión para reto: " + retoId);
+	        System.out.println("Datos de sesión: " + sesion);
+	        
+	        // Obtener el usuario usando el token
+	        Usuario usuario = servicioAutorizacion.getUserByToken(token);
+	        if (usuario == null) {
+	            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	        }
-	        servicioStrava.aniadirSesion(u, token, session.getDeporte(), session.getDistancia(), session.getInicio(), session.getFin(), session.getDuracion());
+	        
+	        // Obtener el reto usando el ID
+	        Optional<Reto> reto = servicioStrava.getDetalleReto(retoId);
+	        if (reto.isEmpty()) {
+	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	        }
+	        
+	        servicioStrava.aniadirSesion(
+	            usuario,
+	            reto.get(),
+	            token,
+	            sesion.getDeporte(), 
+	            sesion.getDistancia(), 
+	            sesion.getHoraInicio(), 
+	            sesion.getHoraFin(), 
+	            sesion.getDuracion()
+	        );
+	        
 	        return new ResponseEntity<>(HttpStatus.CREATED);
-		
+	    } catch (Exception e) {
+	        System.err.println("Error al crear sesión: " + e.getMessage());
+	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
+	}
 	
 	//Obtener una sesión por fecha
 	@Operation(summary = "Obtener una sesión por fecha",description = "Devuelve una lista de sesiones de formación dentro de un rango de fechas especificado", responses = {
@@ -119,26 +232,8 @@ public class ControllerStrava {
 	    }
 	
 
-	// Crear un Reto
-	@Operation(summary = "Crear un reto",description = "Crear un nuevo reto",responses = {
-			@ApiResponse(responseCode = "201", description = "Created: Challenge created successfully"),
-			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token"),
-			@ApiResponse(responseCode = "500", description = "Internal server error") })
-	 
-	@PostMapping("/reto/crear")
-	public ResponseEntity<List<UsuarioDTO>> crearReto(
-			@RequestParam("token") String token,
-			@RequestBody RetoDTO reto) {
-		
-			Usuario u = servicioAutorizacion.getUserByToken(token);
-			if(u == null) {
-				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			}
-			servicioStrava.aniadirSesion(u, token, reto.getDeporte(), Float.parseFloat(reto.getDistancia()), 
-					reto.getFechaInicio(), reto.getFechaFin(), Float.parseFloat(reto.getDuracion()));
-			return new ResponseEntity<>(HttpStatus.CREATED);
-	}
-	
+
+
 	//Obtener todos los retos
 	@Operation(summary = "Obtener todos los retos",description = "Devuelve una lista con todos los retos disponibles.",responses = {
 	        @ApiResponse(responseCode = "200", description = "OK: Retos obtenidos correctamente"),
@@ -147,11 +242,11 @@ public class ControllerStrava {
     public ResponseEntity<List<RetoDTO>> getRetos() {
 		try {
             List<Reto> retos = servicioStrava.getRetos();
-            List<RetoDTO> retoDTOs = new ArrayList<>();
-            for (Reto reto : retos) {
-                RetoDTO retoDTO = retoToDTO(reto);
-                retoDTOs.add(retoDTO);
-            }
+            List<RetoDTO> retoDTOs = retos.stream()
+                    .map(this::retoToDTO)
+                    .collect(Collectors.toList());
+            
+            
             return new ResponseEntity<>(retoDTOs, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -187,40 +282,69 @@ public class ControllerStrava {
 		
 	}
 
-	// Aceptar un reto
-	@Operation(summary = "Aceptar un reto", description = "Permite a un usuario aceptar un reto específico", responses = {
-		    @ApiResponse(responseCode = "200", description = "OK: Challenge accepted successfully"),
-		    @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token"),
-		    @ApiResponse(responseCode = "404", description = "Not Found: Challenge not found"),
-		    @ApiResponse(responseCode = "500", description = "Internal server error")
-		    }
-		)		
-	@PutMapping("/reto/{retoID}")
+	
+	@Operation(summary = "Aceptar un reto", 
+	          description = "Permite a un usuario aceptar un reto específico", 
+	          responses = {
+	              @ApiResponse(responseCode = "200", description = "OK: Challenge accepted successfully"),
+	              @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token"),
+	              @ApiResponse(responseCode = "404", description = "Not Found: Challenge not found"),
+	              @ApiResponse(responseCode = "409", description = "Conflict: Challenge already accepted"),
+	              @ApiResponse(responseCode = "500", description = "Internal server error")
+	          }
+	)
+	@PutMapping("/reto/{retoId}")
 	public ResponseEntity<Void> aceptarReto(
 	        @RequestParam("token") String token,
-	        @PathVariable("idReto") long idReto){	    	
-	    	Usuario u = servicioAutorizacion.getUserByToken(token);
-	    	
-	    	if (u == null) {
-	    		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-	    	}
-	    	
-	    	Reto r = servicioStrava.getReto(idReto);
-	    	if (r == null) {
-		        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		    }
-	    	
-			boolean aceptado = servicioStrava.aceptarReto(u, r);
-			if(aceptado) {
-		        return new ResponseEntity<>(HttpStatus.OK);
-
-			}
-	        
-			return new ResponseEntity<>(HttpStatus.CONFLICT);
-	   
+	        @PathVariable("retoId") Long retoId) {
 	    
+	    // Verificar usuario
+	    Usuario u = servicioAutorizacion.getUserByToken(token);
+	    if (u == null) {
+	        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+	    }
+
+	    // Obtener y verificar el reto
+	    Optional<Reto> optionalReto = servicioStrava.getReto(retoId);
+	    if (optionalReto.isEmpty()) {
+	        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	    }
+
+	    // Intentar aceptar el reto
+	    try {
+	        boolean aceptado = servicioStrava.aceptarReto(u, optionalReto.get());
+	        if (aceptado) {
+	            return new ResponseEntity<>(HttpStatus.OK);
+	        } else {
+	            return new ResponseEntity<>(HttpStatus.CONFLICT);
+	        }
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 	
+	
+	@GetMapping("/reto/{retoId}")
+	public ResponseEntity<RetoDTO> getDetallesReto(
+	    @PathVariable(name = "retoId") Long retoId) {
+	    try {
+	        // Obtener los detalles del reto del servicio
+	        Optional<Reto> reto = servicioStrava.getDetalleReto(retoId);
+
+	        if (reto.isEmpty()) {
+	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	        }
+
+	        // Convertir el reto a DTO
+	        RetoDTO retoDTO = retoToDTO(reto.get());
+	        return new ResponseEntity<>(retoDTO, HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+	
+
+
 	@Operation(summary = "Obtener los retos aceptados por un usuario", description = "Este método obtiene la lista de los retos que un usuario ha aceptado.", responses = {
 		    @ApiResponse(responseCode = "200", description = "OK: Retos aceptados recuperados correctamente"),
 		    @ApiResponse(responseCode = "401", description = "Unauthorized: Token inválido"),
@@ -326,6 +450,9 @@ public class ControllerStrava {
 	
 	private RetoDTO retoToDTO(Reto reto) {
 	    RetoDTO dto = new RetoDTO();
+	    if (reto.getId() != 0) {  // Asegurarnos de que hay un ID
+	        dto.setId(reto.getId());
+	    }
 	    dto.setNombre(reto.getNombreReto());
 	    dto.setFechaInicio(reto.getFechaInicio());
 	    dto.setFechaFin(reto.getFechaFin());
@@ -337,13 +464,16 @@ public class ControllerStrava {
 	
 	private SessionDTO sessionToDTO(Session session) {
 	    SessionDTO sessionDTO = new SessionDTO();
-	    sessionDTO.setNombre(session.getTitulo());  
+	    sessionDTO.setId(session.getId());
+	    sessionDTO.setTitulo(session.getTitulo());  
 	    sessionDTO.setDeporte(session.getDeporte());  
 	    sessionDTO.setDistancia((int) session.getDistancia());  
 	    sessionDTO.setInicio(session.getHoraInicio());  
 	    sessionDTO.setFin(session.getHoraFin()); 
 	    sessionDTO.setDuracion((int) session.getDuracion());  
-	    sessionDTO.setNombreUsuario(session.getUsuario().getEmail()); 
+	    if (session.getUsuario() != null) {
+	        sessionDTO.setNombreUsuario(session.getUsuario().getEmail());
+	    }
 	    
 	    return sessionDTO;
 	}

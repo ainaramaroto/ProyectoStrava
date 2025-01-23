@@ -6,9 +6,10 @@
 package es.deusto.sd.auctions.entity;
 
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -229,6 +230,8 @@ public class Usuario {
 		this.listaRetosAceptados = listaRetosAceptados;
 	}
 
+	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(altura, contrasenia, email, fechaNac, frecuenciaCardiacaMax,frecuenciaCardiacaRep, listaRetosAceptados,
@@ -256,6 +259,8 @@ public class Usuario {
 				&& Objects.equals(nombre, other.nombre) && Objects.equals(nombreUsuario, other.nombreUsuario)
 				&& Float.floatToIntBits(pesoKg) == Float.floatToIntBits(other.pesoKg) && registro == other.registro;
 	}
+
+	
 
 	
 	
